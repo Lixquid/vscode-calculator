@@ -1,0 +1,10 @@
+**/*.map
+
+.vscode/**
+out/test/**
+src/**
+test/**
+typings/**
+
+.gitignore
+tsconfig.json
