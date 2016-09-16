@@ -2,7 +2,7 @@
 	"name": "calculator",
 	"displayName": "Calculator",
 	"description": "Calculation commands and tools for VS Code.",
-	"version": "0.0.1",
+	"version": "0.1.0",
 	"publisher": "lixquid",
 	"icon": "images/logo.png",
 	"engines": {
