@@ -16,17 +16,17 @@ To install *Calculator*, do the following steps:
 
 Select a math expression:
 
-![Usage-1](http://i.imgur.com/Ba6T7k0.png)
+![Usage-1](https://i.imgur.com/Ba6T7k0.png)
 
 The math widget in the status bar will show you the result:
 
-![Usage-2](http://i.imgur.com/ozoUOON.png)
+![Usage-2](https://i.imgur.com/ozoUOON.png)
 
 You can also use Calculator commands to modify the text directly:
 
-![Usage-3](http://i.imgur.com/d7SPoXB.png)
+![Usage-3](https://i.imgur.com/d7SPoXB.png)
 
-![Usage-4](http://i.imgur.com/kj9bC9u.png)
+![Usage-4](https://i.imgur.com/kj9bC9u.png)
 
 ## Commands
 
