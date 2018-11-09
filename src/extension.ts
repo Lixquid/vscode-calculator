@@ -42,15 +42,20 @@ function iterateSelections( all: boolean, callback: ( input: string ) => string 
 
 }
 
+function numberWithCommas (x) {
+	var parts = x.toString().split(".");
+	parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+	return parts.join(".");
+}
 function evaluateSelections(): void {
 	iterateSelections( false, ( input ) => {
-		return input + " = " + math.eval( input ).toString();
+		return input + " = " + math.format(math.eval(input), { precision: 14 })
 	});
 }
 
 function replaceSelections(): void {
 	iterateSelections( false, ( input ) => {
-		return math.eval( input ).toString();
+		return math.format(math.eval(input), { precision: 14 });
 	});
 }
 
@@ -76,7 +81,7 @@ function showInputPanel(): void {
 
 			try {
 				output = math.eval( expression );
-				return output.toString();
+				return math.format(output, {precision: 14});
 			} catch ( ex ) {
 				output = undefined;
 				return "Error";
@@ -104,8 +109,9 @@ function onSelection(): void {
 	if ( editor.selections.length != 1 || editor.selection.isEmpty ) return;
 
 	try {
-		widget.text = "= " + math.eval(
-			editor.document.getText( editor.selection ) ).toString();
+		widget.text = "= " + numberWithCommas(
+			math.format(math.eval(editor.document.getText(editor.selection)), { precision: 14 })
+		);
 		widget.show();
 	} catch ( ex ) { }
 
