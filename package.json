@@ -3,13 +3,29 @@
 	"displayName": "Calculator",
 	"description": "Calculation commands and tools for VS Code.",
 	"version": "0.0.1",
+	"publisher": "lixquid",
+	"icon": "images/logo.png",
 	"engines": {
 		"vscode": "^1.100.0"
+	},
+	"author": {
+		"name": "Lixquid",
+		"url": "https://lixquid.com"
+	},
+	"license": "GPL-3.0-only",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/lixquid/vscode-calculator"
+	},
+	"bugs": {
+		"url": "https://github.com/lixquid/vscode-calculator/issues"
 	},
 	"categories": [
 		"Other"
 	],
-	"activationEvents": [],
+	"activationEvents": [
+		"*"
+	],
 	"main": "./out/extension.js",
 	"contributes": {
 		"commands": [
@@ -24,7 +40,7 @@
 		"compile": "tsc -p ./",
 		"watch": "tsc -watch -p ./",
 		"pretest": "npm run compile && npm run lint",
-		"lint": "eslint src",
+		"lint": "eslint src && prettier --check .",
 		"test": "vscode-test"
 	},
 	"prettier": {
