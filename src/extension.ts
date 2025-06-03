@@ -3,7 +3,6 @@ import { evaluate as mathEval } from "mathjs";
 import * as vscode from "vscode";
 
 //#region Variables
-const config = vscode.workspace.getConfiguration("calculator");
 let widget: vscode.StatusBarItem;
 
 const intl = new Intl.NumberFormat(undefined, {
@@ -20,7 +19,9 @@ function evaluate(input: string): string | undefined {
 				return "Function";
 			case "number":
 			case "bigint":
-				return config.get("humanFormattedOutput", false)
+				return vscode.workspace
+					.getConfiguration("calculator")
+					.get("humanFormattedOutput", false)
 					? intl.format(result)
 					: String(result);
 			default:
@@ -75,7 +76,9 @@ function replaceSelections(): void {
 }
 
 function countSelections(): void {
-	let count = config.get("countStart", 0);
+	let count = vscode.workspace
+		.getConfiguration("calculator")
+		.get("countStart", 0);
 	iterateSelections(true, () => {
 		return String(count++);
 	});
@@ -135,8 +138,6 @@ export function activate(context: vscode.ExtensionContext) {
 
 	// Widget //
 
-	if (config.get("disableWidget", false)) return;
-
 	widget = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right);
 	widget.command = "calculator._hide_widget";
 
@@ -147,5 +148,26 @@ export function activate(context: vscode.ExtensionContext) {
 		command("calculator._hide_widget", () => widget.hide()),
 		// Subscription to a changing selection to update the widget
 		vscode.window.onDidChangeTextEditorSelection(onSelection),
+		vscode.workspace.onDidChangeConfiguration((e) => {
+			if (e.affectsConfiguration("calculator.disableWidget")) {
+				if (
+					vscode.workspace
+						.getConfiguration("calculator")
+						.get("disableWidget", false)
+				) {
+					widget.hide();
+				} else {
+					widget.show();
+				}
+			}
+		}),
 	);
+
+	if (
+		vscode.workspace
+			.getConfiguration("calculator")
+			.get("disableWidget", false)
+	) {
+		widget.hide();
+	}
 }
