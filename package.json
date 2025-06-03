@@ -30,22 +30,22 @@
 	"type": "module",
 	"contributes": {
 		"configuration": {
-			"title": "Calculator Settings",
+			"title": "Calculator",
 			"properties": {
-				"calculator.count_start": {
+				"calculator.countStart": {
 					"type": "integer",
 					"default": 0,
 					"description": "The value to start counting from when using the calculator.count command."
 				},
-				"calculator.disable_widget": {
+				"calculator.disableWidget": {
 					"type": "boolean",
 					"default": false,
 					"description": "Disables the calculation widget."
 				},
-				"calculator.human_output": {
+				"calculator.humanFormattedOutput": {
 					"type": "boolean",
 					"default": false,
-					"description": "If true, the output will be formatted for human readability."
+					"description": "If true, the output will be formatted for human readability. For example, thousand separators will be added to large numbers."
 				}
 			}
 		},

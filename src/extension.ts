@@ -20,7 +20,7 @@ function evaluate(input: string): string | undefined {
 				return "Function";
 			case "number":
 			case "bigint":
-				return config.get("human_output", false)
+				return config.get("humanFormattedOutput", false)
 					? intl.format(result)
 					: String(result);
 			default:
@@ -75,7 +75,7 @@ function replaceSelections(): void {
 }
 
 function countSelections(): void {
-	let count = config.get("count_start", 0);
+	let count = config.get("countStart", 0);
 	iterateSelections(true, () => {
 		return String(count++);
 	});
@@ -135,7 +135,7 @@ export function activate(context: vscode.ExtensionContext) {
 
 	// Widget //
 
-	if (config.get("disable_widget", false)) return;
+	if (config.get("disableWidget", false)) return;
 
 	widget = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right);
 	widget.command = "calculator._hide_widget";
