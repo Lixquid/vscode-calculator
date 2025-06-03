@@ -27,11 +27,43 @@
 		"*"
 	],
 	"main": "./out/extension.js",
+	"type": "module",
 	"contributes": {
+		"configuration": {
+			"title": "Calculator Settings",
+			"properties": {
+				"calculator.count_start": {
+					"type": "integer",
+					"default": 0,
+					"description": "The value to start counting from when using the calculator.count command."
+				},
+				"calculator.disable_widget": {
+					"type": "boolean",
+					"default": false,
+					"description": "Disables the calculation widget."
+				}
+			}
+		},
 		"commands": [
 			{
-				"command": "calculator.helloWorld",
-				"title": "Hello World"
+				"command": "calculator.evaluate",
+				"title": "Evaluate",
+				"category": "Calculator"
+			},
+			{
+				"command": "calculator.replace",
+				"title": "Replace",
+				"category": "Calculator"
+			},
+			{
+				"command": "calculator.count",
+				"title": "Count",
+				"category": "Calculator"
+			},
+			{
+				"command": "calculator.showInput",
+				"title": "Show Input Panel",
+				"category": "Calculator"
 			}
 		]
 	},
@@ -49,6 +81,7 @@
 		"printWidth": 80
 	},
 	"devDependencies": {
+		"@types/copy-paste": "^1.1.33",
 		"@types/mocha": "^10.0.10",
 		"@types/node": "20.x",
 		"@types/vscode": "^1.100.0",
@@ -59,5 +92,9 @@
 		"eslint": "^9.25.1",
 		"prettier": "^3.5.3",
 		"typescript": "^5.8.3"
+	},
+	"dependencies": {
+		"copy-paste": "^2.1.1",
+		"mathjs": "^14.5.2"
 	}
 }
