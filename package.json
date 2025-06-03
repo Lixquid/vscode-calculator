@@ -46,6 +46,11 @@
 					"type": "boolean",
 					"default": false,
 					"description": "If true, the output will be formatted for human readability. For example, thousand separators will be added to large numbers."
+				},
+				"calculator.advanced.bypassInputFormatting": {
+					"type": "boolean",
+					"default": false,
+					"description": "If true, input will not have its newlines removed."
 				}
 			}
 		},

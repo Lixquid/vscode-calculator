@@ -12,6 +12,15 @@ const intl = new Intl.NumberFormat(undefined, {
 
 //#region Utility Functions
 function evaluate(input: string): string | undefined {
+	if (
+		!vscode.workspace
+			.getConfiguration("calculator")
+			.get("advanced.bypassInputFormatting", false)
+	) {
+		// Math.js does not support newlines in expressions, so we replace them with spaces.
+		input = input.replaceAll("\r", "").replaceAll("\n", " ");
+	}
+
 	try {
 		const result = mathEval(input);
 		switch (typeof result) {
@@ -27,7 +36,8 @@ function evaluate(input: string): string | undefined {
 			default:
 				return String(result);
 		}
-	} catch {
+	} catch (ex: unknown) {
+		console.error("Error evaluating expression:", ex);
 		return undefined;
 	}
 }
