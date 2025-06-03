@@ -1,5 +1,5 @@
 import { copy } from "copy-paste";
-import { evaluate } from "mathjs";
+import { evaluate as mathEval } from "mathjs";
 import * as vscode from "vscode";
 
 //#region Variables
@@ -8,9 +8,23 @@ let widget: vscode.StatusBarItem;
 //#endregion
 
 //#region Utility Functions
+function evaluate(input: string): string | undefined {
+	try {
+		const result = mathEval(input);
+		switch (typeof result) {
+			case "function":
+				return "Function";
+			default:
+				return String(result);
+		}
+	} catch {
+		return undefined;
+	}
+}
+
 function iterateSelections(
 	all: boolean,
-	callback: (input: string) => string,
+	callback: (input: string) => string | undefined,
 ): void {
 	const editor = vscode.window.activeTextEditor;
 	const document = editor?.document;
@@ -26,7 +40,7 @@ function iterateSelections(
 
 			try {
 				const result = callback(text);
-				if (result == null) continue;
+				if (result == undefined) continue;
 				edit.replace(selection, result);
 			} catch (ex) {
 				console.error(ex);
@@ -39,21 +53,22 @@ function iterateSelections(
 //#region Command Functions
 function evaluateSelections(): void {
 	iterateSelections(false, (input) => {
-		return input + " = " + evaluate(input).toString();
+		const r = evaluate(input);
+		if (r === undefined) return undefined;
+		return input + " = " + r;
 	});
 }
 
 function replaceSelections(): void {
 	iterateSelections(false, (input) => {
-		return evaluate(input).toString();
+		return evaluate(input);
 	});
 }
 
 function countSelections(): void {
 	let count = config.get("count_start", 0);
 	iterateSelections(true, () => {
-		count++;
-		return (count - 1).toString();
+		return String(count++);
 	});
 }
 
@@ -71,13 +86,8 @@ function showInputPanel(): void {
 		},
 	];
 	box.onDidChangeValue((value) => {
-		try {
-			output = String(evaluate(value));
-			box.prompt = output.toString();
-		} catch (ex) {
-			output = undefined;
-			box.prompt = "Error";
-		}
+		output = evaluate(value);
+		box.prompt = output ?? "Error";
 	});
 	box.onDidAccept(() => {
 		if (output !== undefined) {
@@ -96,12 +106,10 @@ function onSelection(): void {
 	if (!editor || editor.selections.length != 1 || editor.selection.isEmpty)
 		return;
 
-	try {
-		widget.text =
-			"= " +
-			evaluate(editor.document.getText(editor.selection)).toString();
-		widget.show();
-	} catch (ex) {}
+	const r = evaluate(editor.document.getText(editor.selection));
+	if (r === undefined) return;
+	widget.text = "= " + r;
+	widget.show();
 }
 //#endregion
 
