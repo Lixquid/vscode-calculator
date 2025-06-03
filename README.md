@@ -1,71 +1,63 @@
-# calculator README
+# Calculator
 
-This is the README for your extension "calculator". After writing up a brief description, we recommend including the following sections.
+Calculation commands and tools for VS Code.
 
-## Features
+## Installation
 
-Describe specific features of your extension including screenshots of your extension in action. Image paths are relative to this README file.
+To install _Calculator_, do the following steps:
 
-For example if there is an image subfolder under your extension project workspace:
+1. Open Visual Studio Code
+2. Open the Quick Open Palette (By default: `Ctrl-P`)
+3. Type `ext install calculator`
+4. Select the Calculator extension
+5. Select _Install_
 
-\!\[feature X\]\(images/feature-x.png\)
+## Usage
 
-> Tip: Many popular extensions utilize animations. This is an excellent way to show off your extension! We recommend short, focused animations that are easy to follow.
+Select a math expression:
 
-## Requirements
+![Usage-1](https://i.imgur.com/Ba6T7k0.png)
 
-If you have any requirements or dependencies, add a section describing those and how to install and configure them.
+The math widget in the status bar will show you the result:
 
-## Extension Settings
+![Usage-2](https://i.imgur.com/ozoUOON.png)
 
-Include if your extension adds any VS Code settings through the `contributes.configuration` extension point.
+You can also use Calculator commands to modify the text directly:
 
-For example:
+![Usage-3](https://i.imgur.com/d7SPoXB.png)
 
-This extension contributes the following settings:
+![Usage-4](https://i.imgur.com/kj9bC9u.png)
 
-- `myExtension.enable`: Enable/disable this extension.
-- `myExtension.thing`: Set to `blah` to do something.
+## Commands
 
-## Known Issues
+- `calculator.evaluate`
+    - Evaluates the expression, and appends it to the selection.
+- `calculator.replace`
+    - Evaluates the expression, and replaces it with the result.
+- `calculator.count`
+    - Counts each selection / cursor, and replaces the contents with the number.
+- `calculator.count_from`
+    - Counts each selection / cursor, and replaces the contents with the number,
+      starting from a custom value.
+- `calculator.showInput`
+    - Opens an input dialogue that will evaluate anything typed into it.
+      Confirming the dialogue will copy the result to the clipboard.
 
-Calling out known issues can help limit users opening duplicate issues against your extension.
+## Configuration
 
-## Release Notes
+- `calculator.countStart` (Default: `0`)
+    - The value to start counting from when using the calculator.count command.
+- `calculator.disableWidget` (Default: `false`)
+    - Disables the calculation widget.
+- `calculator.humanFormattedOutput` (Default: `false`)
+    - If enabled, the output will be formatted in a human-readable way according
+      to the default locale, such as `1,000,000` instead of `1000000`.
 
-Users appreciate release notes as you update your extension.
+## Other
 
-### 1.0.0
+Powered by [Math JS](http://mathjs.org/).
 
-Initial release of ...
+[Calculator](https://github.com/lixquid/vscode-calculator) is hosted at
+GitHub.
 
-### 1.0.1
-
-Fixed issue #.
-
-### 1.1.0
-
-Added features X, Y, and Z.
-
----
-
-## Following extension guidelines
-
-Ensure that you've read through the extensions guidelines and follow the best practices for creating your extension.
-
-- [Extension Guidelines](https://code.visualstudio.com/api/references/extension-guidelines)
-
-## Working with Markdown
-
-You can author your README using Visual Studio Code. Here are some useful editor keyboard shortcuts:
-
-- Split the editor (`Cmd+\` on macOS or `Ctrl+\` on Windows and Linux).
-- Toggle preview (`Shift+Cmd+V` on macOS or `Shift+Ctrl+V` on Windows and Linux).
-- Press `Ctrl+Space` (Windows, Linux, macOS) to see a list of Markdown snippets.
-
-## For more information
-
-- [Visual Studio Code's Markdown Support](http://code.visualstudio.com/docs/languages/markdown)
-- [Markdown Syntax Reference](https://help.github.com/articles/markdown-basics/)
-
-**Enjoy!**
+Calculator is licensed under the GPLv3.
