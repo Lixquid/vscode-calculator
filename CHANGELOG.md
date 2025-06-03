@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 0.2.0
 
 > _Note_: This version changes configuration option keys, so changes will be lost on upgrade.
 
