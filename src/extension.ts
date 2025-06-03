@@ -84,6 +84,28 @@ function countSelections(): void {
 	});
 }
 
+async function countFromSelections(): Promise<void> {
+	// Request the starting number from the user
+	const value = await vscode.window.showInputBox({
+		title: "Count From",
+		placeHolder: String(
+			vscode.workspace
+				.getConfiguration("calculator")
+				.get("countStart", 0),
+		),
+		validateInput: (input) => {
+			return isNaN(Number.parseInt(input))
+				? "Please enter a valid integer."
+				: undefined;
+		},
+	});
+	if (value === undefined) return;
+	let count = Number.parseInt(value);
+	iterateSelections(true, (input) => {
+		return String(count++);
+	});
+}
+
 function showInputPanel(): void {
 	let output: string | undefined = undefined;
 
@@ -133,6 +155,7 @@ export function activate(context: vscode.ExtensionContext) {
 		command("calculator.evaluate", evaluateSelections),
 		command("calculator.replace", replaceSelections),
 		command("calculator.count", countSelections),
+		command("calculator.countFrom", countFromSelections),
 		command("calculator.showInput", showInputPanel),
 	);
 

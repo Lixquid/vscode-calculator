@@ -66,6 +66,11 @@
 				"category": "Calculator"
 			},
 			{
+				"command": "calculator.countFrom",
+				"title": "Count From",
+				"category": "Calculator"
+			},
+			{
 				"command": "calculator.showInput",
 				"title": "Show Input Panel",
 				"category": "Calculator"
