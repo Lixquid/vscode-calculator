@@ -1,11 +1,10 @@
 import * as copyPaste from "copy-paste";
-import * as math from "mathjs";
+import { evaluate } from "mathjs";
 import * as vscode from "vscode";
 
 // Variables ///////////////////////////////////////////////////////////////////
 
 const config = vscode.workspace.getConfiguration("calculator");
-
 let widget: vscode.StatusBarItem;
 
 // Functions ///////////////////////////////////////////////////////////////////
@@ -15,10 +14,12 @@ function iterateSelections(
 	callback: (input: string) => string,
 ): void {
 	const editor = vscode.window.activeTextEditor;
-	const document = editor.document;
-	const selections = editor.selections;
+	const document = editor?.document;
+	const selections = editor?.selections;
 
-	vscode.window.activeTextEditor.edit((edit) => {
+	if (!document || !selections) return;
+
+	vscode.window.activeTextEditor?.edit((edit) => {
 		for (const selection of selections) {
 			if (selection.isEmpty && !all) continue;
 
@@ -37,19 +38,19 @@ function iterateSelections(
 
 function evaluateSelections(): void {
 	iterateSelections(false, (input) => {
-		return input + " = " + math.eval(input).toString();
+		return input + " = " + evaluate(input).toString();
 	});
 }
 
 function replaceSelections(): void {
 	iterateSelections(false, (input) => {
-		return math.eval(input).toString();
+		return evaluate(input).toString();
 	});
 }
 
 function countSelections(): void {
 	let count = config.get("count_start", 0);
-	iterateSelections(true, (input) => {
+	iterateSelections(true, () => {
 		count++;
 		return (count - 1).toString();
 	});
@@ -59,7 +60,7 @@ function showInputPanel(): void {
 	// This is a bit of a horrible hack.
 	// As a result, there is no way to "cancel" the dialogue box without
 	// entering invalid input.
-	let output;
+	let output: unknown;
 
 	vscode.window
 		.showInputBox({
@@ -67,23 +68,23 @@ function showInputPanel(): void {
 			placeHolder: "Expression",
 			validateInput: function (expression: string): string {
 				try {
-					output = math.eval(expression);
-					return output.toString();
+					output = evaluate(expression);
+					return String(output);
 				} catch (ex) {
 					output = undefined;
 					return "Error";
 				}
 			},
 		})
-		.then(function (expression: string): void {
+		.then(function (value: string | undefined): void {
 			if (
-				expression == null &&
+				value == undefined &&
 				config.get("_debug_disableinputclipboard", false)
 			) {
 				return;
 			}
 
-			if (output == null) return;
+			if (output == undefined) return;
 
 			copyPaste.copy(output);
 		});
@@ -92,12 +93,13 @@ function showInputPanel(): void {
 function onSelection(): void {
 	const editor = vscode.window.activeTextEditor;
 
-	if (editor.selections.length != 1 || editor.selection.isEmpty) return;
+	if (!editor || editor.selections.length != 1 || editor.selection.isEmpty)
+		return;
 
 	try {
 		widget.text =
 			"= " +
-			math.eval(editor.document.getText(editor.selection)).toString();
+			evaluate(editor.document.getText(editor.selection)).toString();
 		widget.show();
 	} catch (ex) {}
 }
