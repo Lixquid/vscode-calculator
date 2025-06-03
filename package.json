@@ -41,6 +41,11 @@
 					"type": "boolean",
 					"default": false,
 					"description": "Disables the calculation widget."
+				},
+				"calculator.human_output": {
+					"type": "boolean",
+					"default": false,
+					"description": "If true, the output will be formatted for human readability."
 				}
 			}
 		},

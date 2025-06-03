@@ -5,6 +5,10 @@ import * as vscode from "vscode";
 //#region Variables
 const config = vscode.workspace.getConfiguration("calculator");
 let widget: vscode.StatusBarItem;
+
+const intl = new Intl.NumberFormat(undefined, {
+	useGrouping: true,
+});
 //#endregion
 
 //#region Utility Functions
@@ -14,6 +18,11 @@ function evaluate(input: string): string | undefined {
 		switch (typeof result) {
 			case "function":
 				return "Function";
+			case "number":
+			case "bigint":
+				return config.get("human_output", false)
+					? intl.format(result)
+					: String(result);
 			default:
 				return String(result);
 		}
