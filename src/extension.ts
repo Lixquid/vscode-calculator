@@ -1,14 +1,13 @@
-import * as copyPaste from "copy-paste";
+import { copy } from "copy-paste";
 import { evaluate } from "mathjs";
 import * as vscode from "vscode";
 
-// Variables ///////////////////////////////////////////////////////////////////
-
+//#region Variables
 const config = vscode.workspace.getConfiguration("calculator");
 let widget: vscode.StatusBarItem;
+//#endregion
 
-// Functions ///////////////////////////////////////////////////////////////////
-
+//#region Utility Functions
 function iterateSelections(
 	all: boolean,
 	callback: (input: string) => string,
@@ -35,7 +34,9 @@ function iterateSelections(
 		}
 	});
 }
+//#endregion
 
+//#region Command Functions
 function evaluateSelections(): void {
 	iterateSelections(false, (input) => {
 		return input + " = " + evaluate(input).toString();
@@ -86,10 +87,12 @@ function showInputPanel(): void {
 
 			if (output == undefined) return;
 
-			copyPaste.copy(output);
+			copy(output);
 		});
 }
+//#endregion
 
+//#region Event Functions
 function onSelection(): void {
 	const editor = vscode.window.activeTextEditor;
 
@@ -103,14 +106,12 @@ function onSelection(): void {
 		widget.show();
 	} catch (ex) {}
 }
-
-// Exports /////////////////////////////////////////////////////////////////////
+//#endregion
 
 export function activate(context: vscode.ExtensionContext) {
 	// Commands //
 
 	const command = vscode.commands.registerCommand;
-
 	context.subscriptions.push(
 		command("calculator.evaluate", evaluateSelections),
 		command("calculator.replace", replaceSelections),
