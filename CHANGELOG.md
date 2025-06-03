@@ -1,9 +1,12 @@
-# Change Log
+# Changelog
 
-All notable changes to the "calculator" extension will be documented in this file.
+## 0.1.1
 
-Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
+- Fix image links in README.
 
-## [Unreleased]
+## 0.1.0
 
-- Initial release
+- Initial Version
+- Added Evaluation, Replace, and Count commands.
+- Added Math Input panel.
+- Added Math status bar widget.
