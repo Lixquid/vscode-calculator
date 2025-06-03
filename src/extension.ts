@@ -58,37 +58,34 @@ function countSelections(): void {
 }
 
 function showInputPanel(): void {
-	// This is a bit of a horrible hack.
-	// As a result, there is no way to "cancel" the dialogue box without
-	// entering invalid input.
-	let output: unknown;
+	let output: string | undefined = undefined;
 
-	vscode.window
-		.showInputBox({
-			prompt: "Enter a Math Expression to evaluate it. Pressing Enter will set the clipboard text to the return value.",
-			placeHolder: "Expression",
-			validateInput: function (expression: string): string {
-				try {
-					output = evaluate(expression);
-					return String(output);
-				} catch (ex) {
-					output = undefined;
-					return "Error";
-				}
-			},
-		})
-		.then(function (value: string | undefined): void {
-			if (
-				value == undefined &&
-				config.get("_debug_disableinputclipboard", false)
-			) {
-				return;
-			}
-
-			if (output == undefined) return;
-
+	const box = vscode.window.createInputBox();
+	box.title = "Math Input";
+	box.placeholder = "Expression";
+	box.buttons = [
+		vscode.QuickInputButtons.Back,
+		{
+			iconPath: new vscode.ThemeIcon("copy"),
+			tooltip: "Copy Result",
+		},
+	];
+	box.onDidChangeValue((value) => {
+		try {
+			output = String(evaluate(value));
+			box.prompt = output.toString();
+		} catch (ex) {
+			output = undefined;
+			box.prompt = "Error";
+		}
+	});
+	box.onDidAccept(() => {
+		if (output !== undefined) {
 			copy(output);
-		});
+			box.dispose();
+		}
+	});
+	box.show();
 }
 //#endregion
 
