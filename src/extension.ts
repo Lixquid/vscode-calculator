@@ -1,5 +1,5 @@
 import { copy } from "copy-paste";
-import { evaluate as mathEval } from "mathjs";
+import { format, evaluate as mathEval } from "mathjs";
 import * as vscode from "vscode";
 
 //#region Variables
@@ -23,16 +23,35 @@ function evaluate(input: string): string | undefined {
 
 	try {
 		const result = mathEval(input);
+		const config = vscode.workspace.getConfiguration("calculator");
 		switch (typeof result) {
 			case "function":
 				return "Function";
 			case "number":
-			case "bigint":
-				return vscode.workspace
-					.getConfiguration("calculator")
-					.get("humanFormattedOutput", false)
-					? intl.format(result)
-					: String(result);
+			case "bigint": {
+				const decimalPlaces = config.get<number>(
+					"advanced.decimalPlaces",
+					14,
+				);
+				let formattedValue: string;
+
+				// Format the number to avoid floating point imprecision issues
+				if (decimalPlaces === -1) {
+					formattedValue = String(result);
+				} else {
+					formattedValue = format(result, {
+						precision: decimalPlaces,
+					});
+				}
+
+				// Export with thousands separators (if specified in the current locale)
+				// if enabled
+				if (config.get("humanFormattedOutput", false)) {
+					return intl.format(Number(formattedValue));
+				} else {
+					return formattedValue;
+				}
+			}
 			default:
 				return String(result);
 		}

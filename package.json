@@ -51,6 +51,12 @@
 					"type": "boolean",
 					"default": false,
 					"description": "If true, input will not have its newlines removed."
+				},
+				"calculator.advanced.decimalPlaces": {
+					"type": "number",
+					"default": 14,
+					"minimum": -1,
+					"description": "Number of decimal places to format evaluated numbers; this is to avoid floating point precision issues, and is recommended to not be changed. Set to -1 to disable formatting."
 				}
 			}
 		},
