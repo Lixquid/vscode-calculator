@@ -35,8 +35,3 @@ jobs:
               env:
                   VSCE_PAT: ${{ secrets.VSCE_PAT }}
               run: npx @vscode/vsce publish
-
-            - name: Publish to Open VSX Registry
-              env:
-                  OVSX_PAT: ${{ secrets.OVSX_PAT }}
-              run: npx ovsx publish
