@@ -1,5 +1,17 @@
 # Changelog
 
+## 0.3.0
+
+- Evaluate / Replace commands now expand selections to whole words when the cursor has no selection. (#3)
+- Add option for decimal places when formatting numbers. (#12)
+- Add thousands separators for human-readable output in the widget, and fix round-off errors. (#5)
+- Suppress logged errors when the widget fails to evaluate. (#14)
+- Change extension type to UI. (#15)
+- Remove the copy-paste dependency. (#17)
+- Add CI workflow to verify the extension and build the VSIX. (#13)
+- Update dependency versions. (#16)
+- Add unit and integration tests.
+
 ## 0.2.0
 
 > _Note_: This version changes configuration option keys, so changes will be lost on upgrade.
