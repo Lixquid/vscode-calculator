@@ -28,6 +28,9 @@ You can also use Calculator commands to modify the text directly:
 
 ![Usage-4](https://i.imgur.com/kj9bC9u.png)
 
+Most commands operate on every selection / cursor in the editor, so they can
+be used to evaluate several expressions at once.
+
 ## Commands
 
 - `calculator.evaluate`
@@ -40,7 +43,7 @@ You can also use Calculator commands to modify the text directly:
       cursor is used instead.
 - `calculator.count`
     - Counts each selection / cursor, and replaces the contents with the number.
-- `calculator.count_from`
+- `calculator.countFrom`
     - Counts each selection / cursor, and replaces the contents with the number,
       starting from a custom value.
 - `calculator.showInput`
@@ -56,6 +59,12 @@ You can also use Calculator commands to modify the text directly:
 - `calculator.humanFormattedOutput` (Default: `false`)
     - If enabled, the output will be formatted in a human-readable way according
       to the default locale, such as `1,000,000` instead of `1000000`.
+- `calculator.advanced.bypassInputFormatting` (Default: `false`)
+    - If enabled, input will not have its newlines removed before evaluation.
+- `calculator.advanced.decimalPlaces` (Default: `14`, Minimum: `-1`)
+    - Number of decimal places to format evaluated numbers. This is to avoid
+      floating point precision issues, and is recommended to not be changed.
+      Set to `-1` to disable formatting.
 
 ## Other
 
