@@ -10,7 +10,16 @@ const intl = new Intl.NumberFormat(undefined, {
 //#endregion
 
 //#region Utility Functions
-function evaluate(input: string): string | undefined {
+function evaluate(
+	input: string,
+	options: { suppressErrorLog?: boolean } = {},
+): string | undefined {
+	const { suppressErrorLog = false } = options;
+	// Filter whitespace-only content to prevent errors.
+	if (input.trim().length === 0) {
+		return undefined;
+	}
+
 	if (
 		!vscode.workspace
 			.getConfiguration("calculator")
@@ -55,7 +64,9 @@ function evaluate(input: string): string | undefined {
 				return String(result);
 		}
 	} catch (ex: unknown) {
-		console.error("Error evaluating expression:", ex);
+		if (!suppressErrorLog) {
+			console.error("Error evaluating expression:", ex);
+		}
 		return undefined;
 	}
 }
@@ -233,7 +244,10 @@ function onSelection(): void {
 		return;
 	}
 
-	const r = evaluate(editor.document.getText(editor.selection));
+	// Suppress errors because the widget is constantly evaluating
+	const r = evaluate(editor.document.getText(editor.selection), {
+		suppressErrorLog: true,
+	});
 	if (r === undefined) {
 		return;
 	}
