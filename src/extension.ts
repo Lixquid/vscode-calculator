@@ -87,8 +87,12 @@ function expandEmptySelection(
 	const text = line.text;
 	let start = selection.start.character;
 	let end = selection.start.character;
-	while (start > 0 && !/\s/.test(text[start - 1])) start--;
-	while (end < text.length && !/\s/.test(text[end])) end++;
+	while (start > 0 && !/\s/.test(text[start - 1])) {
+		start--;
+	}
+	while (end < text.length && !/\s/.test(text[end])) {
+		end++;
+	}
 
 	return new vscode.Selection(
 		selection.start.line,
@@ -106,7 +110,9 @@ function iterateSelections(
 	const document = editor?.document;
 	const selections = editor?.selections;
 
-	if (!document || !selections) return;
+	if (!document || !selections) {
+		return;
+	}
 
 	vscode.window.activeTextEditor?.edit((edit) => {
 		for (const selection of selections) {
@@ -130,7 +136,9 @@ function iterateSelections(
 
 			try {
 				const result = callback(text);
-				if (result == undefined) continue;
+				if (result === undefined || result === null) {
+					continue;
+				}
 				edit.replace(effectiveSelection, result);
 			} catch (ex) {
 				console.error(ex);
@@ -144,7 +152,9 @@ function iterateSelections(
 function evaluateSelections(): void {
 	iterateSelections("expand", (input) => {
 		const r = evaluate(input);
-		if (r === undefined) return undefined;
+		if (r === undefined) {
+			return undefined;
+		}
 		return input + " = " + r;
 	});
 }
@@ -179,7 +189,9 @@ async function countFromSelections(): Promise<void> {
 				: undefined;
 		},
 	});
-	if (value === undefined) return;
+	if (value === undefined) {
+		return;
+	}
 	let count = Number.parseInt(value);
 	iterateSelections("use", (input) => {
 		return String(count++);
@@ -217,11 +229,14 @@ function showInputPanel(): void {
 function onSelection(): void {
 	const editor = vscode.window.activeTextEditor;
 
-	if (!editor || editor.selections.length != 1 || editor.selection.isEmpty)
+	if (!editor || editor.selections.length !== 1 || editor.selection.isEmpty) {
 		return;
+	}
 
 	const r = evaluate(editor.document.getText(editor.selection));
-	if (r === undefined) return;
+	if (r === undefined) {
+		return;
+	}
 	widget.text = "= " + r;
 	widget.show();
 }
