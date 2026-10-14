@@ -28,3 +28,14 @@ jobs:
 
             - name: Test
               run: xvfb-run -a npm test
+
+            - name: Build VSIX
+              run: npx @vscode/vsce package
+
+            - name: Upload VSIX artifact
+              if: github.event_name == 'push' && github.ref == 'refs/heads/master'
+              uses: actions/upload-artifact@v4
+              with:
+                  name: vsix
+                  path: "*.vsix"
+                  if-no-files-found: error
