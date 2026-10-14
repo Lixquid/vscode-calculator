@@ -1,0 +1,42 @@
+name: Publish
+
+on:
+    workflow_dispatch:
+
+jobs:
+    publish:
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v4
+
+            - name: Setup Node.js
+              uses: actions/setup-node@v4
+              with:
+                  node-version: 24
+                  cache: npm
+
+            - name: Install dependencies
+              run: npm ci
+
+            - name: Lint
+              run: npm run lint
+
+            - name: Compile
+              run: npm run compile
+
+            - name: Unit tests
+              run: npm run test:unit
+
+            - name: Integration tests
+              run: xvfb-run -a npm run test:integration
+
+            - name: Publish to Visual Studio Marketplace
+              env:
+                  VSCE_PAT: ${{ secrets.VSCE_PAT }}
+              run: npx @vscode/vsce publish
+
+            - name: Publish to Open VSX Registry
+              env:
+                  OVSX_PAT: ${{ secrets.OVSX_PAT }}
+              run: npx ovsx publish
