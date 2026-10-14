@@ -1,74 +1,27 @@
-import { format, evaluate as mathEval } from "mathjs";
 import * as vscode from "vscode";
+
+import { evaluate, type EvaluateSettings } from "./evaluate.js";
+import { expandEmptySelection } from "./selectionUtils.js";
 
 //#region Variables
 let widget: vscode.StatusBarItem;
 
-const intl = new Intl.NumberFormat(undefined, {
-	useGrouping: true,
-});
 //#endregion
 
 //#region Utility Functions
-function evaluate(
-	input: string,
-	options: { suppressErrorLog?: boolean } = {},
-): string | undefined {
-	const { suppressErrorLog = false } = options;
-	// Filter whitespace-only content to prevent errors.
-	if (input.trim().length === 0) {
-		return undefined;
-	}
-
-	if (
-		!vscode.workspace
-			.getConfiguration("calculator")
-			.get("advanced.bypassInputFormatting", false)
-	) {
-		// Math.js does not support newlines in expressions, so we replace them with spaces.
-		input = input.replaceAll("\r", "").replaceAll("\n", " ");
-	}
-
-	try {
-		const result = mathEval(input);
-		const config = vscode.workspace.getConfiguration("calculator");
-		switch (typeof result) {
-			case "function":
-				return "Function";
-			case "number":
-			case "bigint": {
-				const decimalPlaces = config.get<number>(
-					"advanced.decimalPlaces",
-					14,
-				);
-				let formattedValue: string;
-
-				// Format the number to avoid floating point imprecision issues
-				if (decimalPlaces === -1) {
-					formattedValue = String(result);
-				} else {
-					formattedValue = format(result, {
-						precision: decimalPlaces,
-					});
-				}
-
-				// Export with thousands separators (if specified in the current locale)
-				// if enabled
-				if (config.get("humanFormattedOutput", false)) {
-					return intl.format(Number(formattedValue));
-				} else {
-					return formattedValue;
-				}
-			}
-			default:
-				return String(result);
-		}
-	} catch (ex: unknown) {
-		if (!suppressErrorLog) {
-			console.error("Error evaluating expression:", ex);
-		}
-		return undefined;
-	}
+/**
+ * Reads the settings that control evaluation from the workspace configuration.
+ */
+function getEvaluateSettings(): EvaluateSettings {
+	const config = vscode.workspace.getConfiguration("calculator");
+	return {
+		bypassInputFormatting: config.get(
+			"advanced.bypassInputFormatting",
+			false,
+		),
+		decimalPlaces: config.get("advanced.decimalPlaces", 14),
+		humanFormattedOutput: config.get("humanFormattedOutput", false),
+	};
 }
 
 /**
@@ -86,25 +39,14 @@ type EmptySelectionBehavior = "skip" | "expand" | "use";
  * surrounding the cursor on the same line. If the cursor is not inside a
  * word, the returned selection remains empty.
  */
-function expandEmptySelection(
+function expandSelectionInDocument(
 	document: vscode.TextDocument,
 	selection: vscode.Selection,
 ): vscode.Selection {
-	if (!selection.isEmpty) {
-		return selection;
-	}
-
-	const line = document.lineAt(selection.start.line);
-	const text = line.text;
-	let start = selection.start.character;
-	let end = selection.start.character;
-	while (start > 0 && !/\s/.test(text[start - 1])) {
-		start--;
-	}
-	while (end < text.length && !/\s/.test(text[end])) {
-		end++;
-	}
-
+	const { start, end } = expandEmptySelection(
+		document.lineAt(selection.start.line).text,
+		selection.start.character,
+	);
 	return new vscode.Selection(
 		selection.start.line,
 		start,
@@ -116,16 +58,16 @@ function expandEmptySelection(
 function iterateSelections(
 	emptySelectionBehavior: EmptySelectionBehavior,
 	callback: (input: string) => string | undefined,
-): void {
+): Thenable<boolean> | undefined {
 	const editor = vscode.window.activeTextEditor;
 	const document = editor?.document;
 	const selections = editor?.selections;
 
 	if (!document || !selections) {
-		return;
+		return undefined;
 	}
 
-	vscode.window.activeTextEditor?.edit((edit) => {
+	return editor.edit((edit) => {
 		for (const selection of selections) {
 			let effectiveSelection = selection;
 			if (selection.isEmpty) {
@@ -133,7 +75,7 @@ function iterateSelections(
 					case "skip":
 						continue;
 					case "expand":
-						effectiveSelection = expandEmptySelection(
+						effectiveSelection = expandSelectionInDocument(
 							document,
 							selection,
 						);
@@ -160,9 +102,9 @@ function iterateSelections(
 //#endregion
 
 //#region Command Functions
-function evaluateSelections(): void {
-	iterateSelections("expand", (input) => {
-		const r = evaluate(input);
+async function evaluateSelections(): Promise<void> {
+	await iterateSelections("expand", (input) => {
+		const r = evaluate(input, getEvaluateSettings());
 		if (r === undefined) {
 			return undefined;
 		}
@@ -170,17 +112,17 @@ function evaluateSelections(): void {
 	});
 }
 
-function replaceSelections(): void {
-	iterateSelections("expand", (input) => {
-		return evaluate(input);
+async function replaceSelections(): Promise<void> {
+	await iterateSelections("expand", (input) => {
+		return evaluate(input, getEvaluateSettings());
 	});
 }
 
-function countSelections(): void {
+async function countSelections(): Promise<void> {
 	let count = vscode.workspace
 		.getConfiguration("calculator")
 		.get("countStart", 0);
-	iterateSelections("use", () => {
+	await iterateSelections("use", () => {
 		return String(count++);
 	});
 }
@@ -204,7 +146,7 @@ async function countFromSelections(): Promise<void> {
 		return;
 	}
 	let count = Number.parseInt(value);
-	iterateSelections("use", (input) => {
+	await iterateSelections("use", (input) => {
 		return String(count++);
 	});
 }
@@ -223,7 +165,9 @@ function showInputPanel(): void {
 		},
 	];
 	box.onDidChangeValue((value) => {
-		output = evaluate(value);
+		output = evaluate(value, getEvaluateSettings(), {
+			suppressErrorLog: true,
+		});
 		box.prompt = output ?? "Error";
 	});
 	box.onDidAccept(() => {
@@ -245,9 +189,13 @@ function onSelection(): void {
 	}
 
 	// Suppress errors because the widget is constantly evaluating
-	const r = evaluate(editor.document.getText(editor.selection), {
-		suppressErrorLog: true,
-	});
+	const r = evaluate(
+		editor.document.getText(editor.selection),
+		getEvaluateSettings(),
+		{
+			suppressErrorLog: true,
+		},
+	);
 	if (r === undefined) {
 		return;
 	}

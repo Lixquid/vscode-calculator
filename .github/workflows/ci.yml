@@ -26,8 +26,11 @@ jobs:
             - name: Compile
               run: npm run compile
 
-            - name: Test
-              run: xvfb-run -a npm test
+            - name: Unit tests
+              run: npm run test:unit
+
+            - name: Integration tests
+              run: xvfb-run -a npm run test:integration
 
             - name: Build VSIX
               run: npx @vscode/vsce package

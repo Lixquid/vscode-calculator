@@ -97,7 +97,9 @@
 		"watch": "tsc -watch -p ./",
 		"pretest": "npm run compile && npm run lint",
 		"lint": "eslint src && prettier --check .",
-		"test": "vscode-test"
+		"test": "npm run test:unit && npm run test:integration",
+		"test:unit": "mocha --ui tdd \"out/test/unit/**/*.test.js\"",
+		"test:integration": "vscode-test"
 	},
 	"prettier": {
 		"useTabs": true,
@@ -113,6 +115,7 @@
 		"@vscode/test-cli": "^0.0.15",
 		"@vscode/test-electron": "^3.1.0",
 		"eslint": "^10.12.0",
+		"mocha": "^11.8.0",
 		"prettier": "^3.9.10",
 		"typescript": "^6.0.3"
 	},

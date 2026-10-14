@@ -66,6 +66,17 @@ be used to evaluate several expressions at once.
       floating point precision issues, and is recommended to not be changed.
       Set to `-1` to disable formatting.
 
+## Development
+
+- `npm run compile` compiles the TypeScript sources to `out/`.
+- `npm run watch` recompiles on change.
+- `npm run lint` lints and checks formatting.
+- `npm test` runs the whole test suite (needs a display; use `xvfb-run -a
+npm test` on Linux).
+- `npm run test:unit` runs only the unit tests, without VS Code.
+- `npm run test:integration` runs the integration tests inside a headless
+  VS Code instance.
+
 ## Other
 
 Powered by [Math JS](http://mathjs.org/).
