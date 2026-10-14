@@ -28,6 +28,9 @@
 	],
 	"main": "./out/extension.js",
 	"type": "module",
+	"extensionKind": [
+		"ui"
+	],
 	"contributes": {
 		"configuration": {
 			"title": "Calculator",
