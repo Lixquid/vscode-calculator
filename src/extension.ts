@@ -1,4 +1,3 @@
-import { copy } from "copy-paste";
 import { format, evaluate as mathEval } from "mathjs";
 import * as vscode from "vscode";
 
@@ -154,7 +153,7 @@ function showInputPanel(): void {
 	});
 	box.onDidAccept(() => {
 		if (output !== undefined) {
-			copy(output);
+			void vscode.env.clipboard.writeText(output);
 			box.dispose();
 		}
 	});
