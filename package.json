@@ -53,7 +53,7 @@
 				"calculator.advanced.bypassInputFormatting": {
 					"type": "boolean",
 					"default": false,
-					"description": "If true, input will not have its newlines removed."
+					"description": "If true, input will not have its newlines removed. The math library cannot process expressions over newlines; it is recommended to leave this as false."
 				},
 				"calculator.advanced.decimalPlaces": {
 					"type": "number",
