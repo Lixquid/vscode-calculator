@@ -60,8 +60,46 @@ function evaluate(input: string): string | undefined {
 	}
 }
 
+/**
+ * Determines how empty selections are handled by `iterateSelections`.
+ * - `"skip"`: Empty selections are ignored.
+ * - `"expand"`: Empty selections are expanded to the space-delimited word
+ *   surrounding the cursor.
+ * - `"use"`: Empty selections are used as-is (replacing an empty selection
+ *   inserts text at the cursor).
+ */
+type EmptySelectionBehavior = "skip" | "expand" | "use";
+
+/**
+ * Expands an empty selection to the bounds of the space-delimited word
+ * surrounding the cursor on the same line. If the cursor is not inside a
+ * word, the returned selection remains empty.
+ */
+function expandEmptySelection(
+	document: vscode.TextDocument,
+	selection: vscode.Selection,
+): vscode.Selection {
+	if (!selection.isEmpty) {
+		return selection;
+	}
+
+	const line = document.lineAt(selection.start.line);
+	const text = line.text;
+	let start = selection.start.character;
+	let end = selection.start.character;
+	while (start > 0 && !/\s/.test(text[start - 1])) start--;
+	while (end < text.length && !/\s/.test(text[end])) end++;
+
+	return new vscode.Selection(
+		selection.start.line,
+		start,
+		selection.start.line,
+		end,
+	);
+}
+
 function iterateSelections(
-	all: boolean,
+	emptySelectionBehavior: EmptySelectionBehavior,
 	callback: (input: string) => string | undefined,
 ): void {
 	const editor = vscode.window.activeTextEditor;
@@ -72,14 +110,28 @@ function iterateSelections(
 
 	vscode.window.activeTextEditor?.edit((edit) => {
 		for (const selection of selections) {
-			if (selection.isEmpty && !all) continue;
+			let effectiveSelection = selection;
+			if (selection.isEmpty) {
+				switch (emptySelectionBehavior) {
+					case "skip":
+						continue;
+					case "expand":
+						effectiveSelection = expandEmptySelection(
+							document,
+							selection,
+						);
+						break;
+					case "use":
+						break;
+				}
+			}
 
-			const text = document.getText(selection);
+			const text = document.getText(effectiveSelection);
 
 			try {
 				const result = callback(text);
 				if (result == undefined) continue;
-				edit.replace(selection, result);
+				edit.replace(effectiveSelection, result);
 			} catch (ex) {
 				console.error(ex);
 			}
@@ -90,7 +142,7 @@ function iterateSelections(
 
 //#region Command Functions
 function evaluateSelections(): void {
-	iterateSelections(false, (input) => {
+	iterateSelections("expand", (input) => {
 		const r = evaluate(input);
 		if (r === undefined) return undefined;
 		return input + " = " + r;
@@ -98,7 +150,7 @@ function evaluateSelections(): void {
 }
 
 function replaceSelections(): void {
-	iterateSelections(false, (input) => {
+	iterateSelections("expand", (input) => {
 		return evaluate(input);
 	});
 }
@@ -107,7 +159,7 @@ function countSelections(): void {
 	let count = vscode.workspace
 		.getConfiguration("calculator")
 		.get("countStart", 0);
-	iterateSelections(true, () => {
+	iterateSelections("use", () => {
 		return String(count++);
 	});
 }
@@ -129,7 +181,7 @@ async function countFromSelections(): Promise<void> {
 	});
 	if (value === undefined) return;
 	let count = Number.parseInt(value);
-	iterateSelections(true, (input) => {
+	iterateSelections("use", (input) => {
 		return String(count++);
 	});
 }

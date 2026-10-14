@@ -32,8 +32,12 @@ You can also use Calculator commands to modify the text directly:
 
 - `calculator.evaluate`
     - Evaluates the expression, and appends it to the selection.
+    - If no selection is present, the space-delimited word surrounding the
+      cursor is used instead.
 - `calculator.replace`
     - Evaluates the expression, and replaces it with the result.
+    - If no selection is present, the space-delimited word surrounding the
+      cursor is used instead.
 - `calculator.count`
     - Counts each selection / cursor, and replaces the contents with the number.
 - `calculator.count_from`
